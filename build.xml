@@ -1,0 +1,132 @@
+<project name="Openfire HS-Fulda Auth" default="default">
+
+	<!-- 
+	 target: default
+	 The default target running the complete build.
+	-->
+	<target name="default" depends="dist" description="description" />
+
+
+	<!--
+	 target: init
+	 Initialize the build environment.
+	-->
+	<target name="init">
+		<!-- Define global properties -->
+		<property name="build.dir" value="${basedir}/build" />
+		<property name="dist.dir" value="${basedir}/dist" />
+		<property name="sources.dir" value="${basedir}/src" />
+		<property name="libraries.dir" value="${basedir}/libs" />
+
+		<property name="pkg.name" value="openfire-hsfulda" />
+
+		<property name="server1.ssh.host" value="10.0.23.15" />
+		<property name="server1.ssh.port" value="22" />
+		<property name="server1.ssh.user" value="root" />
+		<property name="server1.ssh.password" value="WtbtIadKoB" />
+		
+    <property name="server2.ssh.host" value="10.0.23.16" />
+    <property name="server2.ssh.port" value="22" />
+    <property name="server2.ssh.user" value="root" />
+    <property name="server2.ssh.password" value="WtbtIadKoB" />
+
+		<property name="server1.libs.dir" value="/usr/share/openfire/lib" />
+		<property name="server2.libs.dir" value="/usr/share/openfire/lib" />
+
+		<property name="server1.restart.command" value="/etc/init.d/openfire restart" />
+		<property name="server2.restart.command" value="/etc/init.d/openfire restart" />
+
+		<!-- Get current pkg.timestamp -->
+		<tstamp>
+			<format property="pkg.timestamp" pattern="yyyyMMddhhmmss" />
+		</tstamp>
+	</target>
+
+
+	<!--
+   target: clean
+   Clean the build structure.
+  -->
+	<target name="clean" depends="init">
+		<delete dir="${build.dir}" />
+	</target>
+
+
+	<!--
+   target: prepare
+	 Prepares the build structure.
+	-->
+	<target name="prepare" depends="init">
+		<!-- Create build directories -->
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${build.dir}/src" />
+		<mkdir dir="${build.dir}/class" />
+
+		<!-- Copy source -->
+		<copy todir="${build.dir}/src">
+			<fileset dir="${sources.dir}">
+				<filename name="**/*.java" />
+			</fileset>
+		</copy>
+	</target>
+
+
+	<!--
+	 target: compile
+	 Compiles the source files.
+	-->
+	<target name="compile" depends="init, prepare">
+		<!-- Compile the source -->
+		<javac destdir="${build.dir}/class" debug="true" debuglevel="source,lines,vars">
+			<src path="${build.dir}/src" />
+
+			<include name="**/*.java" />
+
+			<classpath>
+				<fileset dir="${libraries.dir}">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+
+
+	<!--
+    target: jar
+    Build the jar bundle.
+  -->
+	<target name="jar" depends="init, compile">
+		<!-- Build jar file -->
+		<jar basedir="${build.dir}/class" jarfile="${build.dir}/${pkg.name}.jar" includes="**/*.*">
+		</jar>
+	</target>
+
+
+	<!--
+	  target: dist
+	  Copy the jar to the dist file.
+	-->
+	<target name="dist" depends="init, jar">
+		<!-- Create dist directory -->
+		<mkdir dir="${dist.dir}" />
+
+		<!-- Copy jar file -->
+		<copy file="${build.dir}/${pkg.name}.jar" tofile="${dist.dir}/${pkg.name}-${pkg.timestamp}.jar" />
+	</target>
+
+
+	<!--
+	  target: deploy
+	  Deploy the jar to remote server using scp and restart the server.
+	-->
+	<target name="deploy" depends="clean, init, jar">
+		<!-- Copy the file to remote host -->
+		<scp file="${build.dir}/${pkg.name}.jar" todir="${server1.ssh.user}@${server1.ssh.host}:${server1.libs.dir}/" port="${server1.ssh.port}" password="${server1.ssh.password}" />
+		<scp file="${build.dir}/${pkg.name}.jar" todir="${server2.ssh.user}@${server2.ssh.host}:${server2.libs.dir}/" port="${server2.ssh.port}" password="${server2.ssh.password}" />
+
+		<!-- Restart the server -->
+		<sshexec host="${server1.ssh.host}" username="${server1.ssh.user}" port="${server1.ssh.port}" password="${server1.ssh.password}" command="${server1.restart.command}" />
+		<sshexec host="${server2.ssh.host}" username="${server2.ssh.user}" port="${server2.ssh.port}" password="${server2.ssh.password}" command="${server2.restart.command}" />
+	</target>
+
+</project>
