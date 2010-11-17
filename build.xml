@@ -24,11 +24,11 @@
 		<property name="server1.ssh.port" value="22" />
 		<property name="server1.ssh.user" value="root" />
 		<property name="server1.ssh.password" value="WtbtIadKoB" />
-		
-    <property name="server2.ssh.host" value="10.0.23.16" />
-    <property name="server2.ssh.port" value="22" />
-    <property name="server2.ssh.user" value="root" />
-    <property name="server2.ssh.password" value="WtbtIadKoB" />
+
+		<property name="server2.ssh.host" value="10.0.23.16" />
+		<property name="server2.ssh.port" value="22" />
+		<property name="server2.ssh.user" value="root" />
+		<property name="server2.ssh.password" value="WtbtIadKoB" />
 
 		<property name="server1.libs.dir" value="/usr/share/openfire/lib" />
 		<property name="server2.libs.dir" value="/usr/share/openfire/lib" />
@@ -121,12 +121,12 @@
 	-->
 	<target name="deploy" depends="clean, init, jar">
 		<!-- Copy the file to remote host -->
-		<scp file="${build.dir}/${pkg.name}.jar" todir="${server1.ssh.user}@${server1.ssh.host}:${server1.libs.dir}/" port="${server1.ssh.port}" password="${server1.ssh.password}" />
-		<scp file="${build.dir}/${pkg.name}.jar" todir="${server2.ssh.user}@${server2.ssh.host}:${server2.libs.dir}/" port="${server2.ssh.port}" password="${server2.ssh.password}" />
+		<scp file="${build.dir}/${pkg.name}.jar" todir="${server1.ssh.user}@${server1.ssh.host}:${server1.libs.dir}/" port="${server1.ssh.port}" password="${server1.ssh.password}" trust="true" />
+		<!--<scp file="${build.dir}/${pkg.name}.jar" todir="${server2.ssh.user}@${server2.ssh.host}:${server2.libs.dir}/" port="${server2.ssh.port}" password="${server2.ssh.password}" trust="true" />-->
 
 		<!-- Restart the server -->
-		<sshexec host="${server1.ssh.host}" username="${server1.ssh.user}" port="${server1.ssh.port}" password="${server1.ssh.password}" command="${server1.restart.command}" />
-		<sshexec host="${server2.ssh.host}" username="${server2.ssh.user}" port="${server2.ssh.port}" password="${server2.ssh.password}" command="${server2.restart.command}" />
+		<sshexec host="${server1.ssh.host}" username="${server1.ssh.user}" port="${server1.ssh.port}" password="${server1.ssh.password}" command="${server1.restart.command}" trust="true" />
+		<!--<sshexec host="${server2.ssh.host}" username="${server2.ssh.user}" port="${server2.ssh.port}" password="${server2.ssh.password}" command="${server2.restart.command}" trust="true" />-->
 	</target>
 
 </project>

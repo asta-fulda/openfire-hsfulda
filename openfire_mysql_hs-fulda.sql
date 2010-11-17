@@ -2,14 +2,16 @@
 # $Date: 2005-07-20 00:18:17 -0300 (Wed, 20 Jul 2005) $
 
 CREATE TABLE ofUser (
-  uid		          VARCHAR(256)	NOT NULL	,
-  password		    VARCHAR(40)   NULL      ,
-  name            VARCHAR(256)  NULL      ,
-  email           VARCHAR(256)  NULL      ,
-  creationDate		BIGINT        NOT NULL	,
+  uid		          VARCHAR(256)	NOT NULL	        ,
+  password		    VARCHAR(40)   NULL              ,
+  name            VARCHAR(256)  NULL              ,
+  email           VARCHAR(256)  NULL              ,
+  creationDate		BIGINT        NOT NULL	        ,
   admin           TINYINT(1)    NOT NULL DEFAULT 0,
+  avatar          MEDIUMTEXT    NULL              ,
+  avatar_mime     VARCHAR(32)   NULL              ,
   
-  PRIMARY KEY (username)				          ,
+  PRIMARY KEY (username)				                  ,
   
   INDEX ofUser_cDate_idx (creationDate)
 );
@@ -74,12 +76,6 @@ CREATE TABLE ofRosterGroups (
   groupName             VARCHAR(255)    NOT NULL,
   PRIMARY KEY (rosterID, rank),
   INDEX ofRosterGroup_rosterid_idx (rosterID)
-);
-
-CREATE TABLE ofVCard (
-  username              VARCHAR(64)     NOT NULL,
-  vcard                 MEDIUMTEXT      NOT NULL,
-  PRIMARY KEY (username)
 );
 
 CREATE TABLE ofGroup (
